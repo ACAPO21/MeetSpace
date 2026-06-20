@@ -10,6 +10,7 @@ export interface AuthPayload {
 
 // On enrichit le type Request d'Express pour ajouter req.user (typé)
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface Request {
       user?: AuthPayload;
