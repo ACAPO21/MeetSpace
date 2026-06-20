@@ -1,0 +1,38 @@
+import { Request, Response } from "express";
+import { z } from "zod";
+import * as bookingService from "./booking.service";
+
+const createSchema = z.object({
+  roomId: z.string().min(1),
+  title: z.string().min(1),
+  start: z.coerce.date(),
+  end: z.coerce.date(),
+}).refine((d) => d.start < d.end, { message: "La fin doit être après le début" });
+
+export async function create(req: Request, res: Response) {
+  const parsed = createSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Données invalides" });
+
+  try {
+    const booking = await bookingService.createBooking(
+      req.user!.sub, parsed.data.roomId, parsed.data.title, parsed.data.start, parsed.data.end
+    );
+    return res.status(201).json(booking);
+  } catch (e) {
+    const msg = (e as Error).message;
+    if (msg === "ROOM_NOT_FOUND") return res.status(404).json({ error: "Salle introuvable" });
+    if (msg === "CONFLICT") return res.status(409).json({ error: "Créneau déjà réservé" });
+    return res.status(500).json({ error: "Erreur serveur" });
+  }
+}
+
+export async function listMine(req: Request, res: Response) {
+  const bookings = await bookingService.listMyBookings(req.user!.sub);
+  return res.json(bookings);
+}
+
+export async function cancel(req: Request, res: Response) {
+  const result = await bookingService.cancelBooking(req.params.id, req.user!.sub);
+  if (result.count === 0) return res.status(404).json({ error: "Réservation introuvable" });
+  return res.status(204).send();
+}
