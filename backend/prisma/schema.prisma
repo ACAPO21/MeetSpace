@@ -17,7 +17,8 @@ model User {
   password  String
   name      String
   role      Role      @default(USER)
-  bookings  Booking[]
+  bookings  Booking[] @relation("BookingOwner") 
+  invitedTo Booking[] @relation("BookingParticipants")
   createdAt DateTime  @default(now())
 }
 
@@ -39,15 +40,16 @@ model Room {
 }
 
 model Booking {
-  id        String   @id @default(uuid())
-  title     String
-  start     DateTime
-  end       DateTime
-  room      Room     @relation(fields: [roomId], references: [id])
-  roomId    String
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  createdAt DateTime @default(now())
+  id           String   @id @default(uuid())
+  title        String
+  start        DateTime
+  end          DateTime
+  room         Room     @relation(fields: [roomId], references: [id])
+  roomId       String
+  user         User     @relation("BookingOwner", fields: [userId], references: [id])
+  userId       String
+  participants User[]   @relation("BookingParticipants")     
+  createdAt    DateTime @default(now())
 
   @@index([roomId, start, end])
 }

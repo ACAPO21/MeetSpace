@@ -3,29 +3,52 @@ import { TimeSlot } from "../../domain/booking/timeSlot";
 import { hasConflict } from "../../domain/booking/availability";
 
 export async function createBooking(
-  userId: string, roomId: string, title: string, start: Date, end: Date
+  userId: string, roomId: string, title: string,
+  start: Date, end: Date, participantIds: string[] = []
 ) {
   const room = await prisma.room.findUnique({ where: { id: roomId } });
   if (!room) throw new Error("ROOM_NOT_FOUND");
 
-  const candidate = new TimeSlot(start, end); // valide fin > début
+  const candidate = new TimeSlot(start, end);
 
-  const existing = await prisma.booking.findMany({ where: { roomId } });
-  const existingSlots = existing.map((b) => new TimeSlot(b.start, b.end));
+  // requête INDEXÉE (index roomId, start, end) : ne récupère QUE les chevauchements potentiels
+  const overlapping = await prisma.booking.findMany({
+    where: { roomId, start: { lt: end }, end: { gt: start } },
+  });
+  if (hasConflict(candidate, overlapping.map((b) => new TimeSlot(b.start, b.end)))) {
+    throw new Error("CONFLICT");
+  }
 
-  if (hasConflict(candidate, existingSlots)) throw new Error("CONFLICT"); // ← règle TDD
-
-  return prisma.booking.create({ data: { title, start, end, roomId, userId } });
+  return prisma.booking.create({
+    data: {
+      title, start, end, roomId, userId,
+      participants: { connect: participantIds.map((id) => ({ id })) },
+    },
+    include: { participants: { select: { id: true, name: true } } },
+  });
 }
 
 export function listMyBookings(userId: string) {
   return prisma.booking.findMany({
-    where: { userId },                 // ← IDOR : ses réservations uniquement
-    include: { room: true },
+    where: {
+      OR: [
+        { userId },                                 // propriétaire
+        { participants: { some: { id: userId } } }, // OU invité
+      ],
+    },
+    include: { room: true, participants: { select: { id: true, name: true } } },
     orderBy: { start: "asc" },
   });
 }
 
 export function cancelBooking(id: string, userId: string) {
-  return prisma.booking.deleteMany({ where: { id, userId } }); // ← IDOR
+  return prisma.booking.deleteMany({ where: { id, userId } }); // propriétaire uniquement
+}
+
+export function listRoomAvailability(roomId: string) {
+  return prisma.booking.findMany({
+    where: { roomId },
+    select: { start: true, end: true }, // occupation seule (confidentialité)
+    orderBy: { start: "asc" },
+  });
 }

@@ -7,6 +7,7 @@ const createSchema = z.object({
   title: z.string().min(1),
   start: z.coerce.date(),
   end: z.coerce.date(),
+  participantIds: z.array(z.string()).default([]),
 }).refine((d) => d.start < d.end, { message: "La fin doit être après le début" });
 
 export async function create(req: Request, res: Response) {
@@ -15,7 +16,8 @@ export async function create(req: Request, res: Response) {
 
   try {
     const booking = await bookingService.createBooking(
-      req.user!.sub, parsed.data.roomId, parsed.data.title, parsed.data.start, parsed.data.end
+      req.user!.sub, parsed.data.roomId, parsed.data.title,
+      parsed.data.start, parsed.data.end, parsed.data.participantIds
     );
     return res.status(201).json(booking);
   } catch (e) {
@@ -27,12 +29,15 @@ export async function create(req: Request, res: Response) {
 }
 
 export async function listMine(req: Request, res: Response) {
-  const bookings = await bookingService.listMyBookings(req.user!.sub);
-  return res.json(bookings);
+  return res.json(await bookingService.listMyBookings(req.user!.sub));
 }
 
 export async function cancel(req: Request, res: Response) {
   const result = await bookingService.cancelBooking(req.params.id, req.user!.sub);
   if (result.count === 0) return res.status(404).json({ error: "Réservation introuvable" });
   return res.status(204).send();
+}
+
+export async function roomAvailability(req: Request, res: Response) {
+  return res.json(await bookingService.listRoomAvailability(req.params.roomId));
 }

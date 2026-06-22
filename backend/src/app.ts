@@ -5,6 +5,7 @@ import authRoutes from "./modules/auth/auth.routes";
 import buildingRoutes from "./modules/building/building.routes";
 import roomRoutes from "./modules/room/room.routes";
 import bookingRoutes from "./modules/booking/booking.routes";
+import userRoutes from "./modules/user/user.routes";
 
 const app = express();
 app.use(helmet());
@@ -16,5 +17,6 @@ app.use("/auth", authRoutes);
 app.use("/buildings", buildingRoutes);
 app.use("/rooms", roomRoutes);
 app.use("/bookings", bookingRoutes);
+app.use("/users", userRoutes);
 
 export default app;

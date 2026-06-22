@@ -87,4 +87,32 @@ describe("API Bookings (intégration)", () => {
     const res = await request(app).delete(`/bookings/${mine.body[0].id}`).set("Authorization", `Bearer ${tokenA}`);
     expect(res.status).toBe(204);
   });
+
+  it("expose la disponibilité d'une salle (créneaux occupés, sans détails)", async () => {
+    const res = await request(app).get(`/bookings/room/${roomId}`).set("Authorization", `Bearer ${tokenA}`);
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    if (res.body.length > 0) {
+      expect(res.body[0]).toHaveProperty("start");
+      expect(res.body[0]).toHaveProperty("end");
+      expect(res.body[0]).not.toHaveProperty("title"); // confidentialité : pas de titre exposé
+    }
+  });
+
+  it("un invité voit la réunion dans ses réservations (participant)", async () => {
+    const userBId = JSON.parse(
+      Buffer.from(tokenB.split(".")[1], "base64").toString()
+    ).sub; // id de B depuis son token
+
+    const create = await request(app).post("/bookings").set("Authorization", `Bearer ${tokenA}`)
+      .send({
+        roomId, title: "Réunion avec invité",
+        start: "2026-08-01T14:00:00Z", end: "2026-08-01T15:00:00Z",
+        participantIds: [userBId],
+      });
+    expect(create.status).toBe(201);
+
+    const mineB = await request(app).get("/bookings/mine").set("Authorization", `Bearer ${tokenB}`);
+    expect(mineB.body.some((b: { title: string }) => b.title === "Réunion avec invité")).toBe(true);
+  });
 });
