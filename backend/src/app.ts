@@ -9,7 +9,20 @@ import userRoutes from "./modules/user/user.routes";
 
 const app = express();
 app.use(helmet());
-app.use(cors());
+
+// CORS configuré explicitement : on n'autorise que l'origine du front-end
+// (paramétrable par variable d'environnement), les méthodes réellement
+// utilisées par l'API, et les en-têtes nécessaires (dont Authorization
+// pour le jeton JWT). L'authentification passe par un en-tête Bearer,
+// donc aucun cookie n'est échangé (credentials inutiles).
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
+    methods: ["GET", "POST", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+
 app.use(express.json());
 
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
