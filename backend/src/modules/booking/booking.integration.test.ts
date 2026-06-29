@@ -13,7 +13,6 @@ beforeAll(async () => {
   await prisma.booking.deleteMany({ where: { user: { email: { in: [emailA, emailB] } } } });
   await prisma.user.deleteMany({ where: { email: { in: [emailA, emailB] } } });
 
-  // setup : un bâtiment + une salle (créés en base directement)
   const building = await prisma.building.create({ data: { name: "Test Building", address: "Test" } });
   buildingId = building.id;
   const room = await prisma.room.create({
@@ -21,7 +20,6 @@ beforeAll(async () => {
   });
   roomId = room.id;
 
-  // 2 utilisateurs + leurs tokens (via l'API réelle)
   await request(app).post("/auth/register").send({ email: emailA, password: "Password123", name: "A" });
   await request(app).post("/auth/register").send({ email: emailB, password: "Password123", name: "B" });
   tokenA = (await request(app).post("/auth/login").send({ email: emailA, password: "Password123" })).body.token;
@@ -73,13 +71,13 @@ describe("API Bookings (intégration)", () => {
     expect(resA.body.length).toBeGreaterThanOrEqual(2);
 
     const resB = await request(app).get("/bookings/mine").set("Authorization", `Bearer ${tokenB}`);
-    expect(resB.body.length).toBe(0); // B ne voit AUCUNE résa de A
+    expect(resB.body.length).toBe(0);
   });
 
   it("empêche d'annuler la réservation d'autrui (IDOR → 404)", async () => {
     const mine = await request(app).get("/bookings/mine").set("Authorization", `Bearer ${tokenA}`);
     const res = await request(app).delete(`/bookings/${mine.body[0].id}`).set("Authorization", `Bearer ${tokenB}`);
-    expect(res.status).toBe(404); // 404 = ne révèle pas l'existence
+    expect(res.status).toBe(404);
   });
 
   it("permet d'annuler SA propre réservation (204)", async () => {
@@ -95,14 +93,14 @@ describe("API Bookings (intégration)", () => {
     if (res.body.length > 0) {
       expect(res.body[0]).toHaveProperty("start");
       expect(res.body[0]).toHaveProperty("end");
-      expect(res.body[0]).not.toHaveProperty("title"); // confidentialité : pas de titre exposé
+      expect(res.body[0]).not.toHaveProperty("title");
     }
   });
 
   it("un invité voit la réunion dans ses réservations (participant)", async () => {
     const userBId = JSON.parse(
       Buffer.from(tokenB.split(".")[1], "base64").toString()
-    ).sub; // id de B depuis son token
+    ).sub;
 
     const create = await request(app).post("/bookings").set("Authorization", `Bearer ${tokenA}`)
       .send({
@@ -114,5 +112,19 @@ describe("API Bookings (intégration)", () => {
 
     const mineB = await request(app).get("/bookings/mine").set("Authorization", `Bearer ${tokenB}`);
     expect(mineB.body.some((b: { title: string }) => b.title === "Réunion avec invité")).toBe(true);
+  });
+
+  it("autorise un admin à voir toutes les réservations, refuse un USER (US7)", async () => {
+    const resUser = await request(app).get("/bookings").set("Authorization", `Bearer ${tokenA}`);
+    expect(resUser.status).toBe(403);
+
+    await prisma.user.update({ where: { email: emailB }, data: { role: "ADMIN" } });
+    const adminToken = (
+      await request(app).post("/auth/login").send({ email: emailB, password: "Password123" })
+    ).body.token;
+
+    const resAdmin = await request(app).get("/bookings").set("Authorization", `Bearer ${adminToken}`);
+    expect(resAdmin.status).toBe(200);
+    expect(Array.isArray(resAdmin.body)).toBe(true);
   });
 });

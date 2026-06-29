@@ -52,3 +52,14 @@ export function listRoomAvailability(roomId: string) {
     orderBy: { start: "asc" },
   });
 }
+
+export function listAllBookings() {
+  return prisma.booking.findMany({
+    include: {
+      room: true,
+      user: { select: { id: true, name: true, email: true } }, // organisateur
+      participants: { select: { id: true, name: true } },
+    },
+    orderBy: { start: "asc" },
+  });
+}

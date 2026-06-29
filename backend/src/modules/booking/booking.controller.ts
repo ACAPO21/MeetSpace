@@ -41,3 +41,7 @@ export async function cancel(req: Request, res: Response) {
 export async function roomAvailability(req: Request, res: Response) {
   return res.json(await bookingService.listRoomAvailability(req.params.roomId));
 }
+
+export async function listAll(_req: Request, res: Response) {
+  return res.json(await bookingService.listAllBookings());
+}
