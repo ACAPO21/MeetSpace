@@ -7,3 +7,7 @@ export function listBuildings() {
 export function createBuilding(name: string, address: string) {
   return prisma.building.create({ data: { name, address } });
 }
+
+export function updateBuilding(id: string, data: { name?: string; address?: string }) {
+  return prisma.building.updateMany({ where: { id }, data });
+}

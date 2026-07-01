@@ -5,5 +5,6 @@ import { authenticate, requireRole } from "../../middleware/auth.middleware";
 const router = Router();
 router.get("/", authenticate, buildingController.list);
 router.post("/", authenticate, requireRole("ADMIN"), buildingController.create);
+router.put("/:id", authenticate, requireRole("ADMIN"), buildingController.update);
 
 export default router;

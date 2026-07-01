@@ -18,3 +18,16 @@ export async function create(req: Request, res: Response) {
   const building = await buildingService.createBuilding(parsed.data.name, parsed.data.address);
   return res.status(201).json(building);
 }
+
+const updateSchema = z.object({
+  name: z.string().min(1).optional(),
+  address: z.string().min(1).optional(),
+});
+
+export async function update(req: Request, res: Response) {
+  const parsed = updateSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Données invalides" });
+  const result = await buildingService.updateBuilding(req.params.id, parsed.data);
+  if (result.count === 0) return res.status(404).json({ error: "Bâtiment introuvable" });
+  return res.status(204).send();
+}

@@ -25,6 +25,13 @@ export function createRoom(data: {
   return prisma.room.create({ data });
 }
 
+export function updateRoom(
+  id: string,
+  data: { name?: string; capacity?: number; equipments?: string[]; buildingId?: string }
+) {
+  return prisma.room.updateMany({ where: { id }, data });
+}
+
 export function removeRoom(id: string) {
   return prisma.room.deleteMany({ where: { id } });
 }
