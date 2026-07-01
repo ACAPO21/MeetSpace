@@ -1,8 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { prisma } from "../../lib/prisma";
-
-const JWT_SECRET = process.env.JWT_SECRET ?? "dev_secret_change_me";
+import { JWT_SECRET } from "../../lib/config";
 
 export async function register(email: string, password: string, name: string) {
   const existing = await prisma.user.findUnique({ where: { email } });
