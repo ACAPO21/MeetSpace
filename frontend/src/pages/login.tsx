@@ -35,7 +35,7 @@ export default function Login() {
         <input id="password" type="password" value={password} required
           onChange={(e) => setPassword(e.target.value)}
           style={{ display: "block", width: "100%", marginBottom: 12 }} />
-        {error && <p style={{ color: "red" }}>{error}</p>}
+        {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
         <button type="submit">Se connecter</button>
       </form>
     </div>

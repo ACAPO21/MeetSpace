@@ -108,7 +108,7 @@ export default function Admin() {
     <div style={{ maxWidth: 800, margin: "40px auto", fontFamily: "sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Administration</h1>
-        <button onClick={() => navigate("/rooms")}>← Retour aux salles</button>
+        <button onClick={() => navigate("/rooms")}>Retour aux salles</button>
       </div>
       {msg && <p role="alert">{msg}</p>}
 

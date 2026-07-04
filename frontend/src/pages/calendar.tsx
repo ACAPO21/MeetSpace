@@ -84,7 +84,7 @@ export default function RoomCalendar() {
 
   return (
     <div style={{ maxWidth: 900, margin: "40px auto", fontFamily: "sans-serif" }}>
-      <Link to="/rooms">← Retour aux salles</Link>
+      <Link to="/rooms">Retour aux salles</Link>
       <h1>Calendrier de la salle</h1>
       <p style={{ color: "#666" }}>
         Glisse sur un créneau libre pour choisir la durée, puis renseigne la réunion. Les blocs gris sont occupés.

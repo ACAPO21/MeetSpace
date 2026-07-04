@@ -44,15 +44,18 @@ Appliquer le schéma à la base :
 docker-compose exec backend npx prisma migrate deploy
 ```
 
-Optionnel — charger un jeu de données de démonstration (2 comptes, 1 bâtiment,
-plusieurs salles) :
+Charger le jeu de données initial (3 comptes, 1 bâtiment, plusieurs salles).
+Cette étape est **nécessaire** pour disposer de comptes de connexion : le PoC
+ne gère pas la création de compte en libre-service (prévue via le SSO
+d'entreprise, hors périmètre) ; les comptes sont donc pré-provisionnés ici.
 
 ```bash
 docker-compose exec backend npm run seed
 ```
 
-Comptes créés par le seed : `admin@meetspace.local` et `user@meetspace.local`
-(mot de passe `Password123`).
+Comptes créés par le seed (mot de passe `Password123`) :
+`admin@meetspace.local` (administrateur), `user@meetspace.local` et
+`user2@meetspace.local` (utilisateurs).
 
 ## 4. Vérification
 

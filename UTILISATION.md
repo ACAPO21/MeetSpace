@@ -9,9 +9,11 @@ Ce manuel décrit les parcours principaux côté utilisateur.
 2. Saisir son adresse e-mail et son mot de passe, puis valider.
 3. En cas de succès, on est redirigé vers la liste des salles.
 
-> Comptes de démonstration (si le seed a été exécuté) :
+> Comptes pré-créés par le seed (comptes provisionnés, pas de création en
+> libre-service — voir le manuel de déploiement) :
 > - Administrateur : `admin@meetspace.local` / `Password123`
 > - Utilisateur : `user@meetspace.local` / `Password123`
+> - Utilisateur : `user2@meetspace.local` / `Password123`
 
 Toute tentative d'accès à une page protégée sans être connecté renvoie
 automatiquement vers la page de connexion.
@@ -52,9 +54,12 @@ Seul l'organisateur (propriétaire) peut **annuler** une réservation.
 
 Un utilisateur administrateur dispose d'un menu dédié pour :
 
-- créer un bâtiment ;
-- créer ou supprimer des salles ;
-- consulter l'ensemble des réservations.
+- créer, modifier et supprimer des bâtiments (suppression refusée tant que le
+  bâtiment contient des salles) ;
+- créer, modifier et supprimer des salles (suppression refusée tant que la
+  salle porte des réservations) ;
+- consulter l'ensemble des réservations et en supprimer n'importe laquelle
+  (modération).
 
 Ce menu n'apparaît pas pour un utilisateur standard, et les actions
 correspondantes sont protégées côté serveur.
