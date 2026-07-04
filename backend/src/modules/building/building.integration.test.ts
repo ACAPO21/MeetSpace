@@ -47,4 +47,28 @@ describe("API Buildings (intégration)", () => {
       .send({ name: "", address: "" });
     expect(res.status).toBe(400);
   });
+  it("modifie un bâtiment en ADMIN (204)", async () => {
+    const res = await request(app).put(`/buildings/${createdIds[0]}`).set("Authorization", `Bearer ${adminToken}`)
+      .send({ name: "Bat Modifié" });
+    expect(res.status).toBe(204);
+    const updated = await prisma.building.findUnique({ where: { id: createdIds[0] } });
+    expect(updated?.name).toBe("Bat Modifié");
+  });
+  it("refuse la modification pour un USER (403)", async () => {
+    const res = await request(app).put(`/buildings/${createdIds[0]}`).set("Authorization", `Bearer ${userToken}`)
+      .send({ name: "X" });
+    expect(res.status).toBe(403);
+  });
+  it("refuse la suppression d'un bâtiment contenant des salles (409)", async () => {
+    const room = await prisma.room.create({
+      data: { name: "S", capacity: 2, equipments: [], buildingId: createdIds[0] },
+    });
+    const res = await request(app).delete(`/buildings/${createdIds[0]}`).set("Authorization", `Bearer ${adminToken}`);
+    expect(res.status).toBe(409);
+    await prisma.room.delete({ where: { id: room.id } });
+  });
+  it("supprime un bâtiment vide en ADMIN (204)", async () => {
+    const res = await request(app).delete(`/buildings/${createdIds[0]}`).set("Authorization", `Bearer ${adminToken}`);
+    expect(res.status).toBe(204);
+  });
 });

@@ -127,4 +127,18 @@ describe("API Bookings (intégration)", () => {
     expect(resAdmin.status).toBe(200);
     expect(Array.isArray(resAdmin.body)).toBe(true);
   });
+
+  it("un administrateur peut supprimer la réservation d'un autre (modération, US7)", async () => {
+    await prisma.user.update({ where: { email: emailB }, data: { role: "ADMIN" } });
+    const adminToken = (
+      await request(app).post("/auth/login").send({ email: emailB, password: "Password123" })
+    ).body.token;
+
+    const created = await request(app).post("/bookings").set("Authorization", `Bearer ${tokenA}`)
+      .send({ roomId, title: "A moderer", start: "2026-08-02T10:00:00Z", end: "2026-08-02T11:00:00Z" });
+    expect(created.status).toBe(201);
+
+    const del = await request(app).delete(`/bookings/${created.body.id}`).set("Authorization", `Bearer ${adminToken}`);
+    expect(del.status).toBe(204);
+  });
 });

@@ -20,6 +20,7 @@ beforeAll(async () => {
   buildingId = building.id;
 });
 afterAll(async () => {
+  await prisma.booking.deleteMany({ where: { room: { buildingId } } });
   await prisma.room.deleteMany({ where: { buildingId } });
   await prisma.building.deleteMany({ where: { id: buildingId } });
   await prisma.user.deleteMany({ where: { email: { in: [adminEmail, userEmail] } } });
@@ -50,6 +51,33 @@ describe("API Rooms (intégration)", () => {
   it("filtre par équipement (US2)", async () => {
     const res = await request(app).get("/rooms?equipment=projecteur").set("Authorization", `Bearer ${userToken}`);
     expect(res.body.every((r: { equipments: string[] }) => r.equipments.includes("projecteur"))).toBe(true);
+  });
+  it("modifie une salle en ADMIN (204)", async () => {
+    const res = await request(app).put(`/rooms/${createdRoomIds[0]}`).set("Authorization", `Bearer ${adminToken}`)
+      .send({ capacity: 20 });
+    expect(res.status).toBe(204);
+    const updated = await prisma.room.findUnique({ where: { id: createdRoomIds[0] } });
+    expect(updated?.capacity).toBe(20);
+  });
+  it("refuse la modification pour un USER (403)", async () => {
+    const res = await request(app).put(`/rooms/${createdRoomIds[0]}`).set("Authorization", `Bearer ${userToken}`)
+      .send({ capacity: 5 });
+    expect(res.status).toBe(403);
+  });
+  it("refuse la suppression d'une salle ayant des réservations (409)", async () => {
+    const room = await prisma.room.create({
+      data: { name: "Salle occupée", capacity: 4, equipments: [], buildingId },
+    });
+    createdRoomIds.push(room.id);
+    const owner = await prisma.user.findUnique({ where: { email: adminEmail } });
+    await prisma.booking.create({
+      data: {
+        title: "Occup", start: new Date("2026-09-01T10:00:00Z"), end: new Date("2026-09-01T11:00:00Z"),
+        roomId: room.id, userId: owner!.id,
+      },
+    });
+    const res = await request(app).delete(`/rooms/${room.id}`).set("Authorization", `Bearer ${adminToken}`);
+    expect(res.status).toBe(409);
   });
   it("refuse la suppression pour un USER (403)", async () => {
     const res = await request(app).delete(`/rooms/${createdRoomIds[0]}`).set("Authorization", `Bearer ${userToken}`);
