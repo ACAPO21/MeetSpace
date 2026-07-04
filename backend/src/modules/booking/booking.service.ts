@@ -49,6 +49,11 @@ export function cancelBooking(id: string, userId: string) {
   return prisma.booking.deleteMany({ where: { id, userId } }); // propriétaire uniquement
 }
 
+// Modération : un administrateur peut supprimer n'importe quelle réservation.
+export function cancelBookingAsAdmin(id: string) {
+  return prisma.booking.deleteMany({ where: { id } });
+}
+
 export function listRoomAvailability(roomId: string) {
   return prisma.booking.findMany({
     where: { roomId },

@@ -34,7 +34,11 @@ export async function listMine(req: Request, res: Response) {
 }
 
 export async function cancel(req: Request, res: Response) {
-  const result = await bookingService.cancelBooking(req.params.id, req.user!.sub);
+  // Le propriétaire annule sa réservation ; un administrateur peut annuler n'importe laquelle.
+  const isAdmin = req.user!.role === "ADMIN";
+  const result = isAdmin
+    ? await bookingService.cancelBookingAsAdmin(req.params.id)
+    : await bookingService.cancelBooking(req.params.id, req.user!.sub);
   if (result.count === 0) return res.status(404).json({ error: "Réservation introuvable" });
   return res.status(204).send();
 }

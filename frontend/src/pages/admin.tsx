@@ -65,6 +65,16 @@ export default function Admin() {
     catch (err) { setMsg("❌ " + (err as Error).message); }
   }
 
+  async function deleteBuilding(id: string) {
+    try { await api(`/buildings/${id}`, { method: "DELETE" }); load(); }
+    catch (err) { setMsg("❌ " + (err as Error).message); }
+  }
+
+  async function deleteBooking(id: string) {
+    try { await api(`/bookings/${id}`, { method: "DELETE" }); load(); }
+    catch (err) { setMsg("❌ " + (err as Error).message); }
+  }
+
   function startEditBuilding(b: Building) {
     setEditBuildingId(b.id); setEbName(b.name); setEbAddress(b.address ?? ""); setMsg("");
   }
@@ -122,7 +132,10 @@ export default function Admin() {
           ) : (
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <span>{b.name}{b.address && ` · ${b.address}`}</span>
-              <button onClick={() => startEditBuilding(b)}>Modifier</button>
+              <span style={{ display: "flex", gap: 8 }}>
+                <button onClick={() => startEditBuilding(b)}>Modifier</button>
+                <button onClick={() => deleteBuilding(b.id)}>Supprimer</button>
+              </span>
             </div>
           )}
         </div>
@@ -170,14 +183,18 @@ export default function Admin() {
       <h2 style={{ marginTop: 24 }}>Toutes les réservations</h2>
       {allBookings.length === 0 && <p>Aucune réservation.</p>}
       {allBookings.map(b => (
-        <div key={b.id} style={{ border: "1px solid #ccc", borderRadius: 8, padding: 12, marginBottom: 8 }}>
-          <strong>{b.title}</strong>{b.room && <span> · {b.room.name}</span>}
-          <div style={{ fontSize: 14, color: "#666" }}>
-            {new Date(b.start).toLocaleString("fr-FR")} → {new Date(b.end).toLocaleString("fr-FR")}
+        <div key={b.id} style={{ border: "1px solid #ccc", borderRadius: 8, padding: 12, marginBottom: 8,
+          display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+          <div>
+            <strong>{b.title}</strong>{b.room && <span> · {b.room.name}</span>}
+            <div style={{ fontSize: 14, color: "#666" }}>
+              {new Date(b.start).toLocaleString("fr-FR")} → {new Date(b.end).toLocaleString("fr-FR")}
+            </div>
+            {b.user && <div style={{ fontSize: 13, color: "#444" }}>Organisateur : {b.user.name} ({b.user.email})</div>}
+            {b.participants && b.participants.length > 0 &&
+              <div style={{ fontSize: 13, color: "#444" }}>Invités : {b.participants.map(p => p.name).join(", ")}</div>}
           </div>
-          {b.user && <div style={{ fontSize: 13, color: "#444" }}>Organisateur : {b.user.name} ({b.user.email})</div>}
-          {b.participants && b.participants.length > 0 &&
-            <div style={{ fontSize: 13, color: "#444" }}>Invités : {b.participants.map(p => p.name).join(", ")}</div>}
+          <button onClick={() => deleteBooking(b.id)}>Supprimer</button>
         </div>
       ))}
     </div>

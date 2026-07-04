@@ -31,3 +31,11 @@ export async function update(req: Request, res: Response) {
   if (result.count === 0) return res.status(404).json({ error: "Bâtiment introuvable" });
   return res.status(204).send();
 }
+
+export async function remove(req: Request, res: Response) {
+  const result = await buildingService.removeBuilding(req.params.id);
+  if (result.blocked)
+    return res.status(409).json({ error: "Le bâtiment contient des salles : supprimez-les d'abord." });
+  if (result.count === 0) return res.status(404).json({ error: "Bâtiment introuvable" });
+  return res.status(204).send();
+}

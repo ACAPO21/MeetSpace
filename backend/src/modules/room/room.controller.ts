@@ -40,6 +40,8 @@ export async function update(req: Request, res: Response) {
 
 export async function remove(req: Request, res: Response) {
   const result = await roomService.removeRoom(req.params.id);
+  if (result.blocked)
+    return res.status(409).json({ error: "La salle a des réservations : supprimez-les d'abord." });
   if (result.count === 0) return res.status(404).json({ error: "Salle introuvable" });
   return res.status(204).send();
 }
