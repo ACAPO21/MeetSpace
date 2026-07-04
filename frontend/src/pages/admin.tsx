@@ -36,7 +36,7 @@ export default function Admin() {
       setBuildings(await api("/buildings"));
       setRooms(await api("/rooms"));
       setAllBookings(await api("/bookings"));
-    } catch (err) { setMsg("❌ " + (err as Error).message); }
+    } catch (err) { setMsg((err as Error).message); }
   }
   useEffect(() => { load(); }, []);
 
@@ -44,8 +44,8 @@ export default function Admin() {
     e.preventDefault(); setMsg("");
     try {
       await api("/buildings", { method: "POST", body: JSON.stringify({ name: bName, address: bAddress }) });
-      setMsg("✅ Bâtiment créé"); setBName(""); setBAddress(""); load();
-    } catch (err) { setMsg("❌ " + (err as Error).message); }
+      setMsg("Bâtiment créé"); setBName(""); setBAddress(""); load();
+    } catch (err) { setMsg((err as Error).message); }
   }
 
   async function createRoom(e: React.FormEvent) {
@@ -56,23 +56,23 @@ export default function Admin() {
         equipments: rEquipments.split(",").map(s => s.trim()).filter(Boolean),
         buildingId: rBuildingId,
       }) });
-      setMsg("✅ Salle créée"); setRName(""); setRCapacity(""); setREquipments(""); load();
-    } catch (err) { setMsg("❌ " + (err as Error).message); }
+      setMsg("Salle créée"); setRName(""); setRCapacity(""); setREquipments(""); load();
+    } catch (err) { setMsg((err as Error).message); }
   }
 
   async function deleteRoom(id: string) {
     try { await api(`/rooms/${id}`, { method: "DELETE" }); load(); }
-    catch (err) { setMsg("❌ " + (err as Error).message); }
+    catch (err) { setMsg((err as Error).message); }
   }
 
   async function deleteBuilding(id: string) {
     try { await api(`/buildings/${id}`, { method: "DELETE" }); load(); }
-    catch (err) { setMsg("❌ " + (err as Error).message); }
+    catch (err) { setMsg((err as Error).message); }
   }
 
   async function deleteBooking(id: string) {
     try { await api(`/bookings/${id}`, { method: "DELETE" }); load(); }
-    catch (err) { setMsg("❌ " + (err as Error).message); }
+    catch (err) { setMsg((err as Error).message); }
   }
 
   function startEditBuilding(b: Building) {
@@ -83,8 +83,8 @@ export default function Admin() {
     setMsg("");
     try {
       await api(`/buildings/${id}`, { method: "PUT", body: JSON.stringify({ name: ebName, address: ebAddress }) });
-      setMsg("✅ Bâtiment modifié"); setEditBuildingId(null); load();
-    } catch (err) { setMsg("❌ " + (err as Error).message); }
+      setMsg("Bâtiment modifié"); setEditBuildingId(null); load();
+    } catch (err) { setMsg((err as Error).message); }
   }
 
   function startEditRoom(r: Room) {
@@ -100,8 +100,8 @@ export default function Admin() {
         equipments: erEquipments.split(",").map(s => s.trim()).filter(Boolean),
         buildingId: erBuildingId,
       }) });
-      setMsg("✅ Salle modifiée"); setEditRoomId(null); load();
-    } catch (err) { setMsg("❌ " + (err as Error).message); }
+      setMsg("Salle modifiée"); setEditRoomId(null); load();
+    } catch (err) { setMsg((err as Error).message); }
   }
 
   return (

@@ -96,10 +96,10 @@ function RoomCard({ room }: { room: Room }) {
         method: "POST",
         body: JSON.stringify({ roomId: room.id, title, start, end }),
       });
-      setMsg("✅ Réservation confirmée");
+      setMsg("Réservation confirmée");
       setTitle(""); setStart(""); setEnd("");
     } catch (err) {
-      setMsg("❌ " + (err as Error).message);
+      setMsg((err as Error).message);
     }
   }
 
@@ -112,7 +112,7 @@ function RoomCard({ room }: { room: Room }) {
       </div>
 
       <div style={{ marginTop: 8 }}>
-        <Link to={`/salles/${room.id}/calendrier`}>📅 Voir le calendrier / réserver</Link>
+        <Link to={`/salles/${room.id}/calendrier`}>Voir le calendrier / réserver</Link>
       </div>
 
       <form onSubmit={book} style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
