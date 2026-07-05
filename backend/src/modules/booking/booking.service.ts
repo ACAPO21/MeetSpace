@@ -19,10 +19,14 @@ export async function createBooking(
     throw new Error("CONFLICT");
   }
 
+  // L'organisateur ne peut pas s'inviter lui-même (US8) : on l'exclut des invités
+  // côté serveur, en plus du filtrage déjà fait dans l'interface, et on dédoublonne.
+  const inviteeIds = [...new Set(participantIds)].filter((id) => id !== userId);
+
   return prisma.booking.create({
     data: {
       title, start, end, roomId, userId,
-      participants: { connect: participantIds.map((id) => ({ id })) },
+      participants: { connect: inviteeIds.map((id) => ({ id })) },
     },
     include: { participants: { select: { id: true, name: true } } },
   });
@@ -43,6 +47,11 @@ export function listMyBookings(userId: string) {
 
 export function cancelBooking(id: string, userId: string) {
   return prisma.booking.deleteMany({ where: { id, userId } }); // propriétaire uniquement
+}
+
+// Modération : un administrateur peut supprimer n'importe quelle réservation.
+export function cancelBookingAsAdmin(id: string) {
+  return prisma.booking.deleteMany({ where: { id } });
 }
 
 export function listRoomAvailability(roomId: string) {

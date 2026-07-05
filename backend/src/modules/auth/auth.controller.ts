@@ -25,6 +25,7 @@ export async function register(req: Request, res: Response) {
   } catch (e) {
     if ((e as Error).message === "EMAIL_TAKEN")
       return res.status(409).json({ error: "Email déjà utilisé" });
+    console.error("Erreur inscription :", e);
     return res.status(500).json({ error: "Erreur serveur" });
   }
 }

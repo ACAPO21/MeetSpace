@@ -83,26 +83,6 @@ export default function Rooms() {
 }
 
 function RoomCard({ room }: { room: Room }) {
-  const [title, setTitle] = useState("");
-  const [start, setStart] = useState("");
-  const [end, setEnd] = useState("");
-  const [msg, setMsg] = useState("");
-
-  async function book(e: React.FormEvent) {
-    e.preventDefault();
-    setMsg("");
-    try {
-      await api("/bookings", {
-        method: "POST",
-        body: JSON.stringify({ roomId: room.id, title, start, end }),
-      });
-      setMsg("✅ Réservation confirmée");
-      setTitle(""); setStart(""); setEnd("");
-    } catch (err) {
-      setMsg("❌ " + (err as Error).message);
-    }
-  }
-
   return (
     <div style={{ border: "1px solid #ccc", borderRadius: 8, padding: 16, marginBottom: 12 }}>
       <strong>{room.name}</strong> — {room.capacity} places
@@ -112,19 +92,8 @@ function RoomCard({ room }: { room: Room }) {
       </div>
 
       <div style={{ marginTop: 8 }}>
-        <Link to={`/salles/${room.id}/calendrier`}>📅 Voir le calendrier / réserver</Link>
+        <Link to={`/salles/${room.id}/calendrier`}>Voir le calendrier / réserver</Link>
       </div>
-
-      <form onSubmit={book} style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
-        <input type="text" placeholder="Titre" aria-label="Titre de la réunion" value={title}
-          onChange={(e) => setTitle(e.target.value)} required />
-        <input type="datetime-local" aria-label="Début" value={start}
-          onChange={(e) => setStart(e.target.value)} required />
-        <input type="datetime-local" aria-label="Fin" value={end}
-          onChange={(e) => setEnd(e.target.value)} required />
-        <button type="submit">Réserver</button>
-      </form>
-      {msg && <p style={{ margin: "8px 0 0" }}>{msg}</p>}
     </div>
   );
 }

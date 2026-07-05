@@ -12,6 +12,7 @@ services:
   backend:
     build: ./backend
     environment:
+      NODE_ENV: production
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       PORT: 4000

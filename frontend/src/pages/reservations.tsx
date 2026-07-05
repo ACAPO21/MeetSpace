@@ -40,7 +40,7 @@ export default function MesReservations() {
     <div style={{ maxWidth: 800, margin: "40px auto", fontFamily: "sans-serif" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Mes réservations</h1>
-        <button onClick={() => navigate("/rooms")}>← Retour aux salles</button>
+        <button onClick={() => navigate("/rooms")}>Retour aux salles</button>
       </div>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
