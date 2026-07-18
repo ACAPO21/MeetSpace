@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import type { CSSProperties } from "react";
+import type { CSSProperties, FormEvent } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Calendar, dateFnsLocalizer, Views } from "react-big-calendar";
 import type { View, SlotInfo } from "react-big-calendar";
@@ -40,6 +40,12 @@ export default function RoomCalendar() {
   const [invited, setInvited] = useState<string[]>([]);
   const [modalError, setModalError] = useState("");
 
+  // Réservation accessible au clavier : alternative au glisser-déposer souris du calendrier
+  const [fDate, setFDate] = useState("");
+  const [fStart, setFStart] = useState("");
+  const [fEnd, setFEnd] = useState("");
+  const [formError, setFormError] = useState("");
+
   const me = myUserId();
   const others = users.filter((u) => u.id !== me); // tout le monde SAUF moi
 
@@ -59,6 +65,22 @@ export default function RoomCalendar() {
 
   function openModal(slot: SlotInfo) {
     setPendingSlot({ start: new Date(slot.start), end: new Date(slot.end) });
+    setTitle(""); setInvited([]); setModalError("");
+  }
+
+  // Ouvre la même fenêtre de réservation à partir du formulaire clavier
+  function openFromForm(e: FormEvent) {
+    e.preventDefault();
+    setFormError("");
+    if (!fDate || !fStart || !fEnd) {
+      setFormError("Date, heure de début et heure de fin obligatoires."); return;
+    }
+    const start = new Date(`${fDate}T${fStart}`);
+    const end = new Date(`${fDate}T${fEnd}`);
+    if (end <= start) {
+      setFormError("L'heure de fin doit être postérieure à l'heure de début."); return;
+    }
+    setPendingSlot({ start, end });
     setTitle(""); setInvited([]); setModalError("");
   }
 
@@ -87,9 +109,29 @@ export default function RoomCalendar() {
       <Link to="/rooms">Retour aux salles</Link>
       <h1>Calendrier de la salle</h1>
       <p style={{ color: "#666" }}>
-        Glisse sur un créneau libre pour choisir la durée, puis renseigne la réunion. Les blocs gris sont occupés.
+        Choisis un créneau libre directement sur le calendrier (souris) ou à l'aide du formulaire ci-dessous (clavier), puis renseigne la réunion. Les blocs gris sont occupés.
       </p>
       {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
+
+      <form onSubmit={openFromForm} style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12, marginBottom: 16 }}>
+        <h2 style={{ fontSize: 16, marginTop: 0 }}>Réserver un créneau au clavier</h2>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end" }}>
+          <span style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="bk-date">Date</label>
+            <input id="bk-date" type="date" value={fDate} onChange={(e) => setFDate(e.target.value)} />
+          </span>
+          <span style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="bk-start">Heure de début</label>
+            <input id="bk-start" type="time" value={fStart} onChange={(e) => setFStart(e.target.value)} />
+          </span>
+          <span style={{ display: "flex", flexDirection: "column" }}>
+            <label htmlFor="bk-end">Heure de fin</label>
+            <input id="bk-end" type="time" value={fEnd} onChange={(e) => setFEnd(e.target.value)} />
+          </span>
+          <button type="submit">Continuer</button>
+        </div>
+        {formError && <p role="alert" style={{ color: "red", margin: "8px 0 0" }}>{formError}</p>}
+      </form>
 
       <div style={{ height: 600 }}>
         <Calendar
@@ -126,10 +168,10 @@ export default function RoomCalendar() {
                 {others.map((u) => (
                   <label key={u.id} style={{ display: "block", padding: "2px 0" }}>
                     <input type="checkbox" checked={invited.includes(u.id)} onChange={() => toggleInvite(u.id)} />{" "}
-                    {u.name} <span style={{ color: "#888", fontSize: 13 }}>· {u.email}</span>
+                    {u.name} <span style={{ color: "#595959", fontSize: 13 }}>· {u.email}</span>
                   </label>
                 ))}
-                {others.length === 0 && <span style={{ color: "#888" }}>Aucun autre utilisateur.</span>}
+                {others.length === 0 && <span style={{ color: "#595959" }}>Aucun autre utilisateur.</span>}
               </div>
             </fieldset>
 

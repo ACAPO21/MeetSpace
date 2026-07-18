@@ -32,6 +32,8 @@ Deux filtres permettent d'affiner la recherche :
 2. Les créneaux déjà pris apparaissent en blocs « Occupé » (sans détail, pour
    la confidentialité).
 3. Sélectionner un créneau libre par glisser-déposer (cela fixe la durée).
+   Sans souris, le même créneau peut être renseigné au clavier via le
+   formulaire dédié (date, heure de début, heure de fin).
 4. Saisir l'intitulé de la réunion.
 5. (Facultatif) Inviter des collègues, présentés par nom et e-mail. On ne peut
    pas s'inviter soi-même.
