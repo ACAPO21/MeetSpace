@@ -25,7 +25,7 @@ export default function Login() {
 
   return (
     <div style={{ maxWidth: 360, margin: "80px auto", fontFamily: "sans-serif" }}>
-      <h1>MeetSpace — Connexion</h1>
+      <h1>MeetSpace Connexion</h1>
       <form onSubmit={handleSubmit}>
         <label htmlFor="email">Email</label>
         <input id="email" type="email" value={email} required

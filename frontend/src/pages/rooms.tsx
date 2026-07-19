@@ -85,7 +85,7 @@ export default function Rooms() {
 function RoomCard({ room }: { room: Room }) {
   return (
     <div style={{ border: "1px solid #ccc", borderRadius: 8, padding: 16, marginBottom: 12 }}>
-      <strong>{room.name}</strong> — {room.capacity} places
+      <strong>{room.name}</strong> : {room.capacity} places
       {room.building && <span> · {room.building.name}</span>}
       <div style={{ fontSize: 14, color: "#666" }}>
         Équipements : {room.equipments.join(", ") || "aucun"}

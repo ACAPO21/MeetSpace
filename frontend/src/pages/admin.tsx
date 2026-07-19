@@ -170,7 +170,7 @@ export default function Admin() {
             </div>
           ) : (
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span>{r.name} — {r.capacity} places{r.building && ` · ${r.building.name}`}</span>
+              <span>{r.name} , {r.capacity} places{r.building && ` · ${r.building.name}`}</span>
               <span style={{ display: "flex", gap: 8 }}>
                 <button onClick={() => startEditRoom(r)}>Modifier</button>
                 <button onClick={() => deleteRoom(r.id)}>Supprimer</button>
