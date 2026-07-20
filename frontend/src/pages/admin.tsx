@@ -145,7 +145,7 @@ export default function Admin() {
       <form onSubmit={createRoom} style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
         <input placeholder="Nom" aria-label="Nom de la salle" value={rName} onChange={e => setRName(e.target.value)} required />
         <input type="number" placeholder="Capacité" aria-label="Capacité" value={rCapacity} onChange={e => setRCapacity(e.target.value)} required style={{ width: 90 }} />
-        <input placeholder="Équipements (séparés par ,)" aria-label="Équipements" value={rEquipments} onChange={e => setREquipments(e.target.value)} />
+        <input placeholder="Équipements (séparés par ,)" aria-label="Équipements" value={rEquipments} onChange={e => setREquipments(e.target.value)} style={{ minWidth: 240 }} />
         <select value={rBuildingId} onChange={e => setRBuildingId(e.target.value)} required aria-label="Bâtiment">
           <option value="">— Bâtiment —</option>
           {buildings.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
@@ -160,7 +160,7 @@ export default function Admin() {
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
               <input aria-label="Nom de la salle" value={erName} onChange={e => setErName(e.target.value)} required />
               <input type="number" aria-label="Capacité" value={erCapacity} onChange={e => setErCapacity(e.target.value)} required style={{ width: 90 }} />
-              <input aria-label="Équipements" value={erEquipments} onChange={e => setErEquipments(e.target.value)} placeholder="Équipements (séparés par ,)" />
+              <input aria-label="Équipements" value={erEquipments} onChange={e => setErEquipments(e.target.value)} placeholder="Équipements (séparés par ,)" style={{ minWidth: 240 }} />
               <select value={erBuildingId} onChange={e => setErBuildingId(e.target.value)} required aria-label="Bâtiment">
                 <option value="">— Bâtiment —</option>
                 {buildings.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
