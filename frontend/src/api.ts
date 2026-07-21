@@ -16,6 +16,11 @@ export async function api(path: string, options: RequestInit = {}) {
   });
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
+    // Jeton absent, invalide ou expiré : on nettoie et on renvoie vers la connexion.
+    if (res.status === 401) {
+      clearToken();
+      if (window.location.pathname !== "/login") window.location.assign("/login");
+    }
     throw new Error(body.error || `Erreur ${res.status}`);
   }
   return res.status === 204 ? null : res.json();
